@@ -12,6 +12,12 @@ from .ethpanda import (
     is_ethereum_chain,
     is_ethereum_snapshot,
 )
+from .polkachu import (
+    fetch_polkachu_chains,
+    fetch_polkachu_snapshots,
+    find_polkachu_chain,
+    polkachu_chain_summaries,
+)
 from .publicnode import (
     ChainSummary,
     Snapshot,
@@ -29,7 +35,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.list_chains:
             snapshots = fetch_publicnode_snapshots(timeout=args.timeout)
-            chains = _list_combined_chains(snapshots, include_outdated=args.include_outdated)
+            polkachu_chains = fetch_polkachu_chains(timeout=args.timeout)
+            chains = _list_combined_chains(
+                snapshots,
+                polkachu_chains=polkachu_chains,
+                include_outdated=args.include_outdated,
+            )
             if args.json:
                 print(json.dumps([_chain_to_dict(chain) for chain in chains], indent=2))
             else:
@@ -74,7 +85,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Fetch snapshot URLs from PublicNode and EthPandaOps snapshots.",
+        description="Fetch snapshot URLs from PublicNode, EthPandaOps, and PolkaChu snapshots.",
     )
     parser.add_argument(
         "--chain",
@@ -160,12 +171,18 @@ def _fetch_snapshots_for_filters(
 ) -> list[Snapshot]:
     if is_ethereum_chain(chain):
         return fetch_ethpanda_snapshots(network=network, client=client, timeout=timeout)
+
+    polkachu_chains = fetch_polkachu_chains(timeout=timeout)
+    if find_polkachu_chain(polkachu_chains, chain):
+        return fetch_polkachu_snapshots(chain=chain, timeout=timeout, chains=polkachu_chains)
+
     return fetch_publicnode_snapshots(timeout=timeout)
 
 
 def _list_combined_chains(
     snapshots: list[Snapshot],
     *,
+    polkachu_chains,
     include_outdated: bool,
 ) -> list[ChainSummary]:
     publicnode_without_ethereum = [
@@ -176,6 +193,7 @@ def _list_combined_chains(
         include_outdated=include_outdated,
     )
     chains.append(_ethpanda_chain_summary())
+    chains.extend(polkachu_chain_summaries(polkachu_chains))
     return sorted(chains, key=lambda chain: chain.currency_name.casefold())
 
 

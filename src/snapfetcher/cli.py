@@ -186,10 +186,13 @@ def _fetch_snapshots_for_filters(
         return fetch_ethpanda_snapshots(network=network, client=client, timeout=timeout)
 
     polkachu_chains = fetch_polkachu_chains(timeout=timeout)
+    snapshots = fetch_publicnode_snapshots(timeout=timeout)
     if find_polkachu_chain(polkachu_chains, chain):
-        return fetch_polkachu_snapshots(chain=chain, timeout=timeout, chains=polkachu_chains)
+        snapshots.extend(
+            fetch_polkachu_snapshots(chain=chain, timeout=timeout, chains=polkachu_chains)
+        )
 
-    return fetch_publicnode_snapshots(timeout=timeout)
+    return snapshots
 
 
 def _list_combined_chains(

@@ -53,6 +53,12 @@ Return all matching sources without speed selection:
 PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network mainnet --client geth --no-fastest
 ```
 
+Fastest-source selection applies to every overlapping source group, not only
+Ethereum `geth`. For example, if PublicNode and PolkaChu both expose the same
+Cosmos-family mainnet snapshot, `snapfetcher` benchmarks those candidates and
+keeps the fastest source. Networks or clients exposed by only one source are
+kept as-is.
+
 Fetch Ethereum mainnet `reth`:
 
 ```bash

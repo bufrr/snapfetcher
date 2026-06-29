@@ -5,6 +5,13 @@ import json
 import sys
 from typing import Sequence
 
+from .ethpanda import (
+    ETHPANDA_CLIENTS,
+    ETHPANDA_NETWORKS,
+    fetch_ethpanda_snapshots,
+    is_ethereum_chain,
+    is_ethereum_snapshot,
+)
 from .publicnode import (
     ChainSummary,
     Snapshot,
@@ -20,9 +27,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        snapshots = fetch_publicnode_snapshots(timeout=args.timeout)
         if args.list_chains:
-            chains = list_chains(snapshots, include_outdated=args.include_outdated)
+            snapshots = fetch_publicnode_snapshots(timeout=args.timeout)
+            chains = _list_combined_chains(snapshots, include_outdated=args.include_outdated)
             if args.json:
                 print(json.dumps([_chain_to_dict(chain) for chain in chains], indent=2))
             else:
@@ -30,9 +37,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
 
         chain, network, client = _resolve_filters(args)
+        snapshots = _fetch_snapshots_for_filters(
+            chain=chain,
+            network=network,
+            client=client,
+            timeout=args.timeout,
+        )
         matches = find_snapshots(
             snapshots,
-            chain=chain,
+            chain="ethereum" if is_ethereum_chain(chain) else chain,
             network=network,
             client=client,
             snapshot_type=args.snapshot_type,
@@ -61,14 +74,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Fetch snapshot URLs from PublicNode snapshots.",
+        description="Fetch snapshot URLs from PublicNode and EthPandaOps snapshots.",
     )
     parser.add_argument(
         "--chain",
         help=(
-            "PublicNode currency ID or name to match. If omitted, defaults to "
-            "ethereum mainnet geth. If supplied without --network or --client, "
-            "returns all snapshots for that chain."
+            "Chain ID or name to match. If omitted, defaults to Ethereum "
+            "mainnet geth from EthPandaOps. If supplied without --network or "
+            "--client, returns all snapshots for that chain."
         ),
     )
     parser.add_argument(
@@ -105,7 +118,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--list-chains",
         action="store_true",
-        help="List all chain names available in PublicNode snapshots.",
+        help="List all chain names available through the configured snapshot sources.",
     )
     parser.add_argument(
         "--url-only",
@@ -138,9 +151,48 @@ def _resolve_filters(args: argparse.Namespace) -> tuple[str, str | None, str | N
     return chain, network, client
 
 
+def _fetch_snapshots_for_filters(
+    *,
+    chain: str,
+    network: str | None,
+    client: str | None,
+    timeout: float,
+) -> list[Snapshot]:
+    if is_ethereum_chain(chain):
+        return fetch_ethpanda_snapshots(network=network, client=client, timeout=timeout)
+    return fetch_publicnode_snapshots(timeout=timeout)
+
+
+def _list_combined_chains(
+    snapshots: list[Snapshot],
+    *,
+    include_outdated: bool,
+) -> list[ChainSummary]:
+    publicnode_without_ethereum = [
+        snapshot for snapshot in snapshots if not is_ethereum_snapshot(snapshot)
+    ]
+    chains = list_chains(
+        publicnode_without_ethereum,
+        include_outdated=include_outdated,
+    )
+    chains.append(_ethpanda_chain_summary())
+    return sorted(chains, key=lambda chain: chain.currency_name.casefold())
+
+
+def _ethpanda_chain_summary() -> ChainSummary:
+    return ChainSummary(
+        currency_id="ethereum",
+        currency_name="Ethereum",
+        snapshot_count=len(ETHPANDA_NETWORKS) * len(ETHPANDA_CLIENTS),
+        networks=ETHPANDA_NETWORKS,
+        clients=ETHPANDA_CLIENTS,
+    )
+
+
 def _format_table(snapshots: list[Snapshot]) -> str:
     rows = [
         (
+            "source",
             "chain",
             "network",
             "client",
@@ -153,6 +205,7 @@ def _format_table(snapshots: list[Snapshot]) -> str:
     ]
     rows.extend(
         (
+            snapshot.source,
             snapshot.currency_id,
             snapshot.network_name,
             snapshot.client_id or "-",
@@ -198,6 +251,7 @@ def _format_chain_table(chains: list[ChainSummary]) -> str:
 
 def _snapshot_to_dict(snapshot: Snapshot) -> dict[str, object]:
     return {
+        "source": snapshot.source,
         "currencyId": snapshot.currency_id,
         "currencyName": snapshot.currency_name,
         "networkName": snapshot.network_name,
@@ -252,4 +306,4 @@ def _no_matches_message(
         filters.append(f"pruned={args.pruned}")
     if not args.include_outdated:
         filters.append("outdated=False")
-    return "error: no PublicNode snapshots matched " + ", ".join(filters)
+    return "error: no snapshots matched " + ", ".join(filters)

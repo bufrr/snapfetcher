@@ -40,6 +40,7 @@ class Snapshot:
     is_outdated: bool
     is_pruned: bool
     is_archive: bool
+    source: str = "publicnode"
 
     @classmethod
     def from_publicnode(cls, item: dict[str, Any]) -> "Snapshot":

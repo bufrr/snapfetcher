@@ -1,5 +1,6 @@
-"""Fetch PublicNode snapshot metadata."""
+"""Fetch snapshot metadata from configured snapshot sources."""
 
+from .ethpanda import fetch_ethpanda_snapshot, fetch_ethpanda_snapshots
 from .publicnode import (
     ChainSummary,
     Snapshot,
@@ -13,6 +14,8 @@ __all__ = [
     "ChainSummary",
     "Snapshot",
     "SnapshotFetchError",
+    "fetch_ethpanda_snapshot",
+    "fetch_ethpanda_snapshots",
     "fetch_publicnode_snapshots",
     "find_snapshots",
     "list_chains",

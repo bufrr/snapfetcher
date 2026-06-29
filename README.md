@@ -1,18 +1,18 @@
 # snapfetcher
 
 `snapfetcher` fetches snapshot metadata and download URLs from
-[PublicNode snapshots](https://www.publicnode.com/snapshots).
+[PublicNode snapshots](https://www.publicnode.com/snapshots) and
+[EthPandaOps Ethereum client snapshots](https://ethpandaops.io/data/snapshots/).
 
-It reads the live PublicNode snapshots page, discovers the current Next.js data
-endpoint, and parses the snapshot JSON behind the table.
+Ethereum execution clients use EthPandaOps. Other chains use PublicNode.
 
 ## Features
 
-- List every chain currently available on PublicNode.
+- List every chain currently available through the configured snapshot sources.
 - Fetch all snapshot URLs by chain name.
 - Filter by network, client, snapshot type, archive, and pruned status.
 - Output human-readable tables, URL-only output, or JSON.
-- Defaults to Ethereum mainnet `geth`.
+- Defaults to Ethereum mainnet `geth` from EthPandaOps.
 
 ## Usage
 
@@ -37,8 +37,8 @@ Default Ethereum mainnet `geth` lookup:
 PYTHONPATH=src python3 -m snapfetcher --url-only
 ```
 
-PublicNode publishes Ethereum mainnet `geth` as split `base` and `part`
-archives, so the default command returns both segment URLs.
+Ethereum execution-client snapshots come from EthPandaOps and are returned as a
+single `snapshot.tar.zst` URL for the latest available block.
 
 Fetch Ethereum mainnet `reth`:
 
@@ -46,7 +46,13 @@ Fetch Ethereum mainnet `reth`:
 PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network mainnet --client reth --no-archive --url-only
 ```
 
-List all chains currently available in PublicNode snapshots:
+Fetch all EthPandaOps Ethereum execution-client snapshots for a network:
+
+```bash
+PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network hoodi
+```
+
+List all chains currently available:
 
 ```bash
 PYTHONPATH=src python3 -m snapfetcher --list-chains
@@ -64,7 +70,7 @@ returns all matching networks and clients for that chain name.
 Filter a specific snapshot type:
 
 ```bash
-PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network mainnet --client geth --type part --url-only
+PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network mainnet --client geth --type full --url-only
 ```
 
 Return JSON metadata:
@@ -75,11 +81,11 @@ PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --client reth --json
 
 ## Current Chain Names
 
-This list was fetched from PublicNode on 2026-06-29. PublicNode can add or
-remove chains over time, so run `snapfetcher --list-chains` for the latest
-live list.
+This list was fetched from PublicNode on 2026-06-29, with Ethereum execution
+clients sourced from EthPandaOps. Snapshot sources can add or remove chains over
+time, so run `snapfetcher --list-chains` for the latest live list.
 
-| Chain name | PublicNode ID |
+| Chain name | ID |
 | --- | --- |
 | 0g | og |
 | Akash Network | akash |
@@ -168,9 +174,9 @@ live list.
 ## CLI Reference
 
 ```text
---chain CHAIN          PublicNode currency ID or chain name.
+--chain CHAIN          Chain ID or chain name.
 --network NETWORK      Network name, such as mainnet, sepolia, testnet, hoodi.
---client CLIENT        Client ID, such as geth, reth, erigon, lighthouse.
+--client CLIENT        Client ID, such as geth, reth, erigon, nethermind.
 --type TYPE            Snapshot type: base, part, or full.
 --archive/--no-archive Filter archive snapshots.
 --pruned/--no-pruned   Filter pruned snapshots.
@@ -184,17 +190,18 @@ live list.
 ## Python API
 
 ```python
-from snapfetcher import fetch_publicnode_snapshots, find_snapshots, list_chains
+from snapfetcher import fetch_ethpanda_snapshots, fetch_publicnode_snapshots, find_snapshots, list_chains
 
 snapshots = fetch_publicnode_snapshots()
 chains = list_chains(snapshots)
 bitcoin = find_snapshots(snapshots, chain="Bitcoin")
+
+ethereum = fetch_ethpanda_snapshots(network="mainnet", client="reth")
 ethereum_reth = find_snapshots(
-    snapshots,
-    chain="Ethereum",
+    ethereum,
+    chain="ethereum",
     network="mainnet",
     client="reth",
-    archive=False,
 )
 ```
 

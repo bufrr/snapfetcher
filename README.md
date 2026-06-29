@@ -73,6 +73,98 @@ Return JSON metadata:
 PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --client reth --json
 ```
 
+## Current Chain Names
+
+This list was fetched from PublicNode on 2026-06-29. PublicNode can add or
+remove chains over time, so run `snapfetcher --list-chains` for the latest
+live list.
+
+| Chain name | PublicNode ID |
+| --- | --- |
+| 0g | og |
+| Akash Network | akash |
+| Aptos | aptos |
+| Arbitrum | arbitrum |
+| AtomOne | atomone |
+| Avail | avail |
+| Avalanche | avalanche |
+| Axelar | axelar |
+| Babylon | babylon |
+| Base | base |
+| Berachain | berachain |
+| Bitcoin | bitcoin |
+| Bitcoin SV | bsv |
+| Bitway | bitway |
+| Blast | blast |
+| BNB Smart Chain | bsc |
+| Cardano | cardano |
+| Celer Network | celer |
+| Celestia | celestia |
+| Celo | celo |
+| Cheqd | cheqd |
+| Chiliz | chiliz |
+| Cosmos | cosmos |
+| Cronos | cronos |
+| Cronos PoS Chain | cronos-pos |
+| Dash | dash |
+| DeFiChain | defi |
+| Dora Factory | dora |
+| dYdX | dydx |
+| Elys Network | elys |
+| Energi | energi |
+| Ethereum | ethereum |
+| Fetch.ai | fetch |
+| Firo | firo |
+| Fraxtal | fraxtal |
+| Gnosis | gnosis |
+| HAQQ | haqq |
+| Injective | injective |
+| Juno | juno |
+| Kava | kava |
+| Kusama | kusama |
+| Linea | linea |
+| Litecoin | litecoin |
+| Lumera | lumera |
+| Mantle | mantle |
+| MAP Protocol | map |
+| Medibloc | medibloc |
+| Metis | metis |
+| Moonbeam | moonbeam |
+| Moonriver | moonriver |
+| NEAR Protocol | near |
+| Neutron | neutron |
+| opBNB | opbnb |
+| Optimism | optimism |
+| Oraichain | orai |
+| Osmosis | osmosis |
+| PIVX | pivx |
+| Polkadot | polkadot |
+| Polygon | polygon |
+| PulseChain | pulsechain |
+| Radix | radixdlt |
+| Saga | saga |
+| Scroll | scroll |
+| Sei | sei |
+| Sentinel | sentinel |
+| Somnia | somnia |
+| Soneium | soneium |
+| Sonic | sonic |
+| Starknet | starknet |
+| Story | story |
+| Sui | sui |
+| Symbol | symbol |
+| Syscoin | syscoin |
+| Taiko | taiko |
+| Tempo | tempo |
+| Terra | terra |
+| Terra Classic | terra-classic |
+| TRON | tron |
+| TX | tx-chain |
+| Unichain | unichain |
+| Warden | warden |
+| WEMIX | wemix |
+| XPLA | xpla |
+
 ## CLI Reference
 
 ```text

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "snapfetcher"
 version = "0.1.0"
-description = "Fetch PublicNode snapshot URLs from the live snapshots page."
+description = "Fetch and select snapshot URLs from PublicNode, EthPandaOps, and PolkaChu."
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "snapfetcher contributors" }]

@@ -5,16 +5,19 @@
 [EthPandaOps Ethereum client snapshots](https://ethpandaops.io/data/snapshots/)
 and [PolkaChu Tendermint snapshots](https://www.polkachu.com/tendermint_snapshots).
 
-Ethereum execution clients use EthPandaOps. Tendermint chain names and slugs
-listed by PolkaChu use PolkaChu. Other chains use PublicNode.
+Ethereum execution clients can use EthPandaOps and PublicNode. Tendermint chain
+names and slugs listed by PolkaChu use PolkaChu. Other chains use PublicNode.
+When sources overlap, `snapfetcher` benchmarks candidates and keeps the fastest
+source by default.
 
 ## Features
 
 - List every chain currently available through the configured snapshot sources.
-- Fetch all snapshot URLs by chain name.
+- Fetch snapshot URLs by chain name.
 - Filter by network, client, snapshot type, archive, and pruned status.
+- Benchmark overlapping sources and return the fastest source by default.
 - Output human-readable tables, URL-only output, JSON, or CSV.
-- Defaults to Ethereum mainnet `geth` from EthPandaOps.
+- Defaults to Ethereum mainnet `geth` and selects the fastest matching source.
 
 ## Usage
 
@@ -39,8 +42,15 @@ Default Ethereum mainnet `geth` lookup:
 PYTHONPATH=src python3 -m snapfetcher --url-only
 ```
 
-Ethereum execution-client snapshots come from EthPandaOps and are returned as a
-single `snapshot.tar.zst` URL for the latest available block.
+Ethereum execution-client snapshots can come from EthPandaOps and PublicNode.
+When multiple sources match, `snapfetcher` benchmarks a small range request and
+returns the fastest source by default.
+
+Return all matching sources without speed selection:
+
+```bash
+PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network mainnet --client geth --no-fastest
+```
 
 Fetch Ethereum mainnet `reth`:
 
@@ -48,7 +58,7 @@ Fetch Ethereum mainnet `reth`:
 PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network mainnet --client reth --no-archive --url-only
 ```
 
-Fetch all EthPandaOps Ethereum execution-client snapshots for a network:
+Fetch Ethereum execution-client snapshots for a network:
 
 ```bash
 PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --network hoodi
@@ -66,7 +76,7 @@ Write the chain list as a spreadsheet-friendly CSV:
 PYTHONPATH=src python3 -m snapfetcher --list-chains --csv > chains.csv
 ```
 
-Fetch every snapshot URL for a chain by its chain name:
+Fetch the fastest matching snapshot source for a chain by its chain name:
 
 ```bash
 PYTHONPATH=src python3 -m snapfetcher --chain "Bitcoin" --url-only
@@ -80,7 +90,8 @@ PYTHONPATH=src python3 -m snapfetcher --chain cosmos --url-only
 ```
 
 When `--chain` is supplied without `--network` or `--client`, `snapfetcher`
-returns all matching networks and clients for that chain name.
+matches all networks and clients for that chain name, then keeps the fastest
+source unless `--no-fastest` is supplied.
 
 Filter a specific snapshot type:
 
@@ -295,6 +306,7 @@ A spreadsheet-friendly CSV copy is available at [chains.csv](chains.csv).
 --url-only             Print only snapshot URLs.
 --json                 Print JSON metadata.
 --csv                  Print spreadsheet-friendly CSV output.
+--fastest/--no-fastest Benchmark matching sources and keep the fastest source.
 --timeout SECONDS      Network timeout. Defaults to 30.
 ```
 

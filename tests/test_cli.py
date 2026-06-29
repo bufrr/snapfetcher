@@ -95,10 +95,33 @@ class CliTest(unittest.TestCase):
             cli.fetch_polkachu_chains = original_polkachu_chains
             cli.fetch_polkachu_snapshots = original_polkachu_snapshots
 
+    def test_fetches_ethereum_from_ethpanda_and_publicnode(self):
+        original_ethpanda = cli.fetch_ethpanda_snapshots
+        original_publicnode = cli.fetch_publicnode_snapshots
+        try:
+            cli.fetch_ethpanda_snapshots = lambda network, client, timeout: [
+                _snapshot("ethpandaops", "Ethereum", currency_id="ethereum", client_id="geth")
+            ]
+            cli.fetch_publicnode_snapshots = lambda timeout: [
+                _snapshot("publicnode", "Ethereum", currency_id="ethereum", client_id="geth")
+            ]
 
-def _snapshot(source, currency_name, *, client_id):
+            snapshots = cli._fetch_snapshots_for_filters(
+                chain="Ethereum",
+                network="mainnet",
+                client="geth",
+                timeout=1,
+            )
+
+            self.assertEqual({snapshot.source for snapshot in snapshots}, {"ethpandaops", "publicnode"})
+        finally:
+            cli.fetch_ethpanda_snapshots = original_ethpanda
+            cli.fetch_publicnode_snapshots = original_publicnode
+
+
+def _snapshot(source, currency_name, *, client_id, currency_id="axelar"):
     return Snapshot(
-        currency_id="axelar",
+        currency_id=currency_id,
         currency_name=currency_name,
         network_name="mainnet",
         snapshot_name="axelar",

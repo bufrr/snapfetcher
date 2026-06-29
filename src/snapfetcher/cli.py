@@ -28,6 +28,7 @@ from .publicnode import (
     find_snapshots,
     list_chains,
 )
+from .speedtest import select_fastest_source
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -70,6 +71,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             archive=args.archive,
             pruned=args.pruned,
         )
+        if args.fastest:
+            matches = select_fastest_source(matches, timeout=args.timeout)
     except SnapshotFetchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -99,8 +102,8 @@ def _build_parser() -> argparse.ArgumentParser:
         "--chain",
         help=(
             "Chain ID or name to match. If omitted, defaults to Ethereum "
-            "mainnet geth from EthPandaOps. If supplied without --network or "
-            "--client, returns all snapshots for that chain."
+            "mainnet geth with fastest-source selection. If supplied without --network or "
+            "--client, matches all snapshots for that chain before fastest-source selection."
         ),
     )
     parser.add_argument(
@@ -155,6 +158,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Print spreadsheet-friendly CSV output.",
     )
     parser.add_argument(
+        "--fastest",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Benchmark matching snapshot sources and keep the fastest source. "
+            "Use --no-fastest to return all matching sources."
+        ),
+    )
+    parser.add_argument(
         "--timeout",
         type=float,
         default=30.0,
@@ -183,7 +195,9 @@ def _fetch_snapshots_for_filters(
     timeout: float,
 ) -> list[Snapshot]:
     if is_ethereum_chain(chain):
-        return fetch_ethpanda_snapshots(network=network, client=client, timeout=timeout)
+        snapshots = fetch_ethpanda_snapshots(network=network, client=client, timeout=timeout)
+        snapshots.extend(fetch_publicnode_snapshots(timeout=timeout))
+        return snapshots
 
     polkachu_chains = fetch_polkachu_chains(timeout=timeout)
     snapshots = fetch_publicnode_snapshots(timeout=timeout)

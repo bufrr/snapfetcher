@@ -62,7 +62,7 @@ Dymension,dymension,mainnet,tendermint
 Elys Network,elys,"mainnet, testnet",-
 Empower,empower,mainnet,tendermint
 Energi,energi,mainnet,-
-Ethereum,ethereum,"mainnet, sepolia, hoodi, holesky, perf-devnet-2, perf-devnet-3","besu, erigon, geth, nethermind, reth"
+Ethereum,ethereum,"mainnet, sepolia, hoodi, holesky, perf-devnet-2, perf-devnet-3","besu, erigon, geth, nethermind, reth, lighthouse, prysm, teku"
 Fetch,fetch,mainnet,tendermint
 Fetch.ai,fetch,mainnet,-
 FirmaChain,firmachain,mainnet,tendermint

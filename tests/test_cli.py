@@ -1,7 +1,12 @@
 import unittest
 
 import snapfetcher.cli as cli
-from snapfetcher.cli import _chain_to_dict, _format_chain_csv, _format_chain_table
+from snapfetcher.cli import (
+    _chain_to_dict,
+    _format_chain_csv,
+    _format_chain_table,
+    _list_combined_chains,
+)
 from snapfetcher.polkachu import PolkachuChain
 from snapfetcher.publicnode import ChainSummary, Snapshot, find_snapshots
 
@@ -117,6 +122,21 @@ class CliTest(unittest.TestCase):
         finally:
             cli.fetch_ethpanda_snapshots = original_ethpanda
             cli.fetch_publicnode_snapshots = original_publicnode
+
+    def test_combined_chain_list_merges_ethereum_publicnode_clients(self):
+        chains = _list_combined_chains(
+            [
+                _snapshot("publicnode", "Ethereum", currency_id="ethereum", client_id="geth"),
+                _snapshot("publicnode", "Ethereum", currency_id="ethereum", client_id="lighthouse"),
+            ],
+            polkachu_chains=[],
+            include_outdated=False,
+        )
+        ethereum = next(chain for chain in chains if chain.currency_id == "ethereum")
+
+        self.assertIn("geth", ethereum.clients)
+        self.assertIn("reth", ethereum.clients)
+        self.assertIn("lighthouse", ethereum.clients)
 
 
 def _snapshot(source, currency_name, *, client_id, currency_id="axelar"):

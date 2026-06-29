@@ -7,15 +7,15 @@ and [PolkaChu Tendermint snapshots](https://www.polkachu.com/tendermint_snapshot
 
 Ethereum execution clients can use EthPandaOps and PublicNode. Tendermint chain
 names and slugs listed by PolkaChu use PolkaChu. Other chains use PublicNode.
-When sources overlap, `snapfetcher` benchmarks candidates and keeps the fastest
-source by default.
+When sources overlap, `snapfetcher` benchmarks each matching chain/network/client
+group and keeps the fastest source by default.
 
 ## Features
 
 - List every chain currently available through the configured snapshot sources.
 - Fetch snapshot URLs by chain name.
 - Filter by network, client, snapshot type, archive, and pruned status.
-- Benchmark overlapping sources and return the fastest source by default.
+- Benchmark overlapping sources per matching group and return the fastest source by default.
 - Output human-readable tables, URL-only output, JSON, or CSV.
 - Defaults to Ethereum mainnet `geth` and selects the fastest matching source.
 
@@ -43,8 +43,9 @@ PYTHONPATH=src python3 -m snapfetcher --url-only
 ```
 
 Ethereum execution-client snapshots can come from EthPandaOps and PublicNode.
-When multiple sources match, `snapfetcher` benchmarks a small range request and
-returns the fastest source by default.
+When multiple sources match, `snapfetcher` benchmarks a small range request for
+each matching chain/network/client group and returns the fastest source for that
+group by default.
 
 Return all matching sources without speed selection:
 
@@ -91,7 +92,7 @@ PYTHONPATH=src python3 -m snapfetcher --chain cosmos --url-only
 
 When `--chain` is supplied without `--network` or `--client`, `snapfetcher`
 matches all networks and clients for that chain name, then keeps the fastest
-source unless `--no-fastest` is supplied.
+source per matching group unless `--no-fastest` is supplied.
 
 Filter a specific snapshot type:
 
@@ -178,7 +179,7 @@ A spreadsheet-friendly CSV copy is available at [chains.csv](chains.csv).
 | Elys Network | elys | mainnet, testnet | - |
 | Empower | empower | mainnet | tendermint |
 | Energi | energi | mainnet | - |
-| Ethereum | ethereum | mainnet, sepolia, hoodi, holesky, perf-devnet-2, perf-devnet-3 | besu, erigon, geth, nethermind, reth |
+| Ethereum | ethereum | mainnet, sepolia, hoodi, holesky, perf-devnet-2, perf-devnet-3 | besu, erigon, geth, nethermind, reth, lighthouse, prysm, teku |
 | Fetch | fetch | mainnet | tendermint |
 | Fetch.ai | fetch | mainnet | - |
 | FirmaChain | firmachain | mainnet | tendermint |
@@ -306,7 +307,7 @@ A spreadsheet-friendly CSV copy is available at [chains.csv](chains.csv).
 --url-only             Print only snapshot URLs.
 --json                 Print JSON metadata.
 --csv                  Print spreadsheet-friendly CSV output.
---fastest/--no-fastest Benchmark matching sources and keep the fastest source.
+--fastest/--no-fastest Benchmark matching source groups and keep the fastest source.
 --timeout SECONDS      Network timeout. Defaults to 30.
 ```
 

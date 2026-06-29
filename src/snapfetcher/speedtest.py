@@ -36,14 +36,20 @@ def select_fastest_source(
     probe: Probe | None = None,
 ) -> list[Snapshot]:
     snapshots = list(snapshots)
-    by_source = _group_by_source(snapshots)
-    if len(by_source) <= 1:
-        return snapshots
+    selected: list[Snapshot] = []
 
     probe = probe or probe_url
-    results = speedtest_sources(by_source, timeout=timeout, probe_bytes=probe_bytes, probe=probe)
-    fastest = min(results, key=lambda result: (result.elapsed_seconds, result.source))
-    return [snapshot for snapshot in snapshots if snapshot.source == fastest.source]
+    for group in _group_by_selection_key(snapshots).values():
+        by_source = _group_by_source(group)
+        if len(by_source) <= 1:
+            selected.extend(group)
+            continue
+
+        results = speedtest_sources(by_source, timeout=timeout, probe_bytes=probe_bytes, probe=probe)
+        fastest = min(results, key=lambda result: (result.elapsed_seconds, result.source))
+        selected.extend(snapshot for snapshot in group if snapshot.source == fastest.source)
+
+    return selected
 
 
 def speedtest_sources(
@@ -110,6 +116,21 @@ def _group_by_source(snapshots: Iterable[Snapshot]) -> dict[str, list[Snapshot]]
     return by_source
 
 
+def _group_by_selection_key(snapshots: Iterable[Snapshot]) -> dict[tuple[str, str, str], list[Snapshot]]:
+    by_chain_network: dict[tuple[str, str], list[Snapshot]] = {}
+    for snapshot in snapshots:
+        key = (_norm(snapshot.currency_id), _norm(snapshot.network_name))
+        by_chain_network.setdefault(key, []).append(snapshot)
+
+    grouped: dict[tuple[str, str, str], list[Snapshot]] = {}
+    for (chain, network), group in by_chain_network.items():
+        clientless_group = any(snapshot.client_id is None for snapshot in group)
+        for snapshot in group:
+            client = "*" if clientless_group else _norm(snapshot.client_id)
+            grouped.setdefault((chain, network, client), []).append(snapshot)
+    return grouped
+
+
 def _representative_snapshot(snapshots: list[Snapshot]) -> Snapshot:
     return sorted(snapshots, key=_snapshot_rank)[0]
 
@@ -118,3 +139,7 @@ def _snapshot_rank(snapshot: Snapshot) -> tuple[int, int, str]:
     type_rank = {"full": 0, "part": 1, "base": 2}.get(snapshot.snapshot_type.casefold(), 3)
     height = snapshot.block_heights[-1] if snapshot.block_heights else -1
     return type_rank, -height, snapshot.url
+
+
+def _norm(value: str | None) -> str:
+    return (value or "").strip().casefold()

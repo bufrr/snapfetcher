@@ -162,7 +162,7 @@ def _build_parser() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction,
         default=True,
         help=(
-            "Benchmark matching snapshot sources and keep the fastest source. "
+            "Benchmark matching snapshot source groups and keep the fastest source per group. "
             "Use --no-fastest to return all matching sources."
         ),
     )
@@ -222,19 +222,49 @@ def _list_combined_chains(
         publicnode_without_ethereum,
         include_outdated=include_outdated,
     )
-    chains.append(_ethpanda_chain_summary())
+    chains.append(_ethereum_chain_summary(snapshots, include_outdated=include_outdated))
     chains.extend(polkachu_chain_summaries(polkachu_chains))
     return sorted(chains, key=lambda chain: chain.currency_name.casefold())
 
 
-def _ethpanda_chain_summary() -> ChainSummary:
+def _ethereum_chain_summary(
+    snapshots: list[Snapshot],
+    *,
+    include_outdated: bool,
+) -> ChainSummary:
+    publicnode_ethereum = [
+        snapshot for snapshot in snapshots if is_ethereum_snapshot(snapshot)
+    ]
+    publicnode_chains = list_chains(publicnode_ethereum, include_outdated=include_outdated)
+    publicnode_chain = publicnode_chains[0] if publicnode_chains else None
+
     return ChainSummary(
         currency_id="ethereum",
         currency_name="Ethereum",
-        snapshot_count=len(ETHPANDA_NETWORKS) * len(ETHPANDA_CLIENTS),
-        networks=ETHPANDA_NETWORKS,
-        clients=ETHPANDA_CLIENTS,
+        snapshot_count=(len(ETHPANDA_NETWORKS) * len(ETHPANDA_CLIENTS))
+        + (publicnode_chain.snapshot_count if publicnode_chain else 0),
+        networks=_merge_values(
+            ETHPANDA_NETWORKS,
+            publicnode_chain.networks if publicnode_chain else (),
+        ),
+        clients=_merge_values(
+            ETHPANDA_CLIENTS,
+            publicnode_chain.clients if publicnode_chain else (),
+        ),
     )
+
+
+def _merge_values(*groups: tuple[str, ...]) -> tuple[str, ...]:
+    values: list[str] = []
+    seen: set[str] = set()
+    for group in groups:
+        for value in group:
+            key = value.casefold()
+            if key in seen:
+                continue
+            values.append(value)
+            seen.add(key)
+    return tuple(values)
 
 
 def _format_table(snapshots: list[Snapshot]) -> str:

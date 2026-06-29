@@ -5,7 +5,7 @@ from snapfetcher.publicnode import ChainSummary
 
 
 class CliTest(unittest.TestCase):
-    def test_chain_table_includes_network_count_and_names(self):
+    def test_chain_table_includes_network_names_without_counts(self):
         table = _format_chain_table(
             [
                 ChainSummary(
@@ -18,13 +18,15 @@ class CliTest(unittest.TestCase):
             ]
         )
 
-        self.assertIn("network_count", table)
+        header = table.splitlines()[0]
+
+        self.assertNotIn("snapshots", header)
+        self.assertNotIn("network_count", header)
         self.assertIn("network_names", table)
         self.assertIn("Bitcoin", table)
-        self.assertIn("2", table)
         self.assertIn("mainnet, testnet", table)
 
-    def test_chain_json_includes_network_count_and_names(self):
+    def test_chain_json_keeps_summary_fields(self):
         payload = _chain_to_dict(
             ChainSummary(
                 currency_id="ethereum",

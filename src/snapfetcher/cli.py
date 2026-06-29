@@ -246,13 +246,11 @@ def _format_table(snapshots: list[Snapshot]) -> str:
 
 
 def _format_chain_table(chains: list[ChainSummary]) -> str:
-    rows = [("chain", "id", "snapshots", "network_count", "network_names", "clients")]
+    rows = [("chain", "id", "network_names", "clients")]
     rows.extend(
         (
             chain.currency_name,
             chain.currency_id,
-            str(chain.snapshot_count),
-            str(len(chain.networks)),
             ", ".join(chain.networks) or "-",
             ", ".join(chain.clients) or "-",
         )

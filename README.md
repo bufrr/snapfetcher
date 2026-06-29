@@ -95,184 +95,184 @@ Snapshot sources can add or remove chains over time, so run
 `snapfetcher --list-chains` for the latest live list.
 
 ```text
-chain               id             snapshots  network_count  network_names                                                   clients                             
-------------------  -------------  ---------  -------------  --------------------------------------------------------------  ------------------------------------
-0g                  og             3          1              mainnet                                                         chain, geth                         
-Agoric              agoric         1          1              mainnet                                                         tendermint                          
-Akash               akash          1          1              mainnet                                                         tendermint                          
-Akash Network       akash          1          1              mainnet                                                         -                                   
-Allora              allora         1          1              mainnet                                                         tendermint                          
-Althea              althea         1          1              mainnet                                                         tendermint                          
-Andromeda           andromeda      1          1              mainnet                                                         tendermint                          
-Aptos               aptos          1          1              mainnet                                                         -                                   
-Arbitrum            arbitrum       6          3              mainnet, nova, sepolia                                          -                                   
-Archway             archway        1          1              mainnet                                                         tendermint                          
-Arkeo               arkeo          1          1              mainnet                                                         tendermint                          
-Asset Mantle        assetmantle    1          1              mainnet                                                         tendermint                          
-AtomOne             atomone        1          1              mainnet                                                         -                                   
-Aura                aura           1          1              mainnet                                                         tendermint                          
-Avail               avail          2          2              mainnet, turing                                                 -                                   
-Avalanche           avalanche      4          2              fuji, mainnet                                                   -                                   
-Axelar              axelar         1          1              mainnet                                                         -                                   
-Axelar              axelar         1          1              mainnet                                                         tendermint                          
-Babylon             babylon        1          1              mainnet                                                         -                                   
-Babylon             babylon        1          1              mainnet                                                         tendermint                          
-Band                band           1          1              mainnet                                                         tendermint                          
-Base                base           6          2              mainnet, sepolia                                                reth                                
-Berachain           berachain      2          1              mainnet                                                         beacon, reth                        
-BitBadges           bitbadges      1          1              mainnet                                                         tendermint                          
-Bitcoin             bitcoin        4          2              mainnet, testnet                                                -                                   
-Bitcoin SV          bsv            1          1              mainnet                                                         -                                   
-Bitsong             bitsong        1          1              mainnet                                                         tendermint                          
-Bitway              bitway         1          1              mainnet                                                         -                                   
-Bitway              bitway         1          1              mainnet                                                         tendermint                          
-Blast               blast          2          1              mainnet                                                         geth                                
-BNB Smart Chain     bsc            4          2              mainnet, testnet                                                geth                                
-Canto               canto          1          1              mainnet                                                         tendermint                          
-Carbon              carbon         1          1              mainnet                                                         tendermint                          
-Cardano             cardano        1          1              mainnet                                                         -                                   
-Celer Network       celer          1          1              mainnet                                                         -                                   
-Celestia            celestia       2          2              mainnet, testnet                                                -                                   
-Celestia            celestia       1          1              mainnet                                                         tendermint                          
-Celo                celo           2          1              mainnet                                                         geth                                
-Chain4Energy        chain4energy   1          1              mainnet                                                         tendermint                          
-Cheqd               cheqd          1          1              mainnet                                                         -                                   
-Cheqd               cheqd          1          1              mainnet                                                         tendermint                          
-Chihuahua           chihuahua      1          1              mainnet                                                         tendermint                          
-Chiliz              chiliz         4          2              mainnet, spicy                                                  -                                   
-Coreum              coreum         1          1              mainnet                                                         tendermint                          
-Cosmos              cosmos         1          1              mainnet                                                         -                                   
-CosmosHub           cosmos         1          1              mainnet                                                         tendermint                          
-Crescent            crescent       1          1              mainnet                                                         tendermint                          
-Cronos              cronos         1          1              mainnet                                                         -                                   
-Cronos              cronos         1          1              mainnet                                                         tendermint                          
-Cronos PoS Chain    cronos-pos     1          1              mainnet                                                         -                                   
-Crypto.org          cryptocom      1          1              mainnet                                                         tendermint                          
-Dash                dash           3          2              mainnet, testnet                                                -                                   
-Decentr             decentr        1          1              mainnet                                                         tendermint                          
-DeFiChain           defi           1          1              mainnet                                                         -                                   
-dHealth             dhealth        1          1              mainnet                                                         tendermint                          
-Dora                dora           1          1              mainnet                                                         tendermint                          
-Dora Factory        dora           1          1              mainnet                                                         -                                   
-dYdX                dydx           1          1              mainnet                                                         -                                   
-dYdX                dydx           1          1              mainnet                                                         tendermint                          
-Dymension           dymension      1          1              mainnet                                                         tendermint                          
-Elys Network        elys           2          2              mainnet, testnet                                                -                                   
-Empower             empower        1          1              mainnet                                                         tendermint                          
-Energi              energi         1          1              mainnet                                                         -                                   
-Ethereum            ethereum       30         6              mainnet, sepolia, hoodi, holesky, perf-devnet-2, perf-devnet-3  besu, erigon, geth, nethermind, reth
-Fetch               fetch          1          1              mainnet                                                         tendermint                          
-Fetch.ai            fetch          1          1              mainnet                                                         -                                   
-FirmaChain          firmachain     1          1              mainnet                                                         tendermint                          
-Firo                firo           2          1              mainnet                                                         -                                   
-Fraxtal             fraxtal        4          2              hoodi, mainnet                                                  geth                                
-Gitopia             gitopia        1          1              mainnet                                                         tendermint                          
-Gnosis              gnosis         4          2              chiado, mainnet                                                 nethermind, teku                    
-Gravity             gravity        1          1              mainnet                                                         tendermint                          
-HAQQ                haqq           1          1              mainnet                                                         -                                   
-Haqq                haqq           1          1              mainnet                                                         tendermint                          
-Hippo Protocol      hippo          1          1              mainnet                                                         tendermint                          
-Humans              humans         1          1              mainnet                                                         tendermint                          
-Initia              initia         1          1              mainnet                                                         tendermint                          
-Injective           injective      2          2              mainnet, testnet                                                -                                   
-Injective           injective      1          1              mainnet                                                         tendermint                          
-interval            interval       1          1              mainnet                                                         tendermint                          
-Jackal              jackal         1          1              mainnet                                                         tendermint                          
-Juno                juno           1          1              mainnet                                                         -                                   
-Juno                juno           1          1              mainnet                                                         tendermint                          
-Kava                kava           1          1              mainnet                                                         -                                   
-Kava                kava           1          1              mainnet                                                         tendermint                          
-Kujira              kujira         1          1              mainnet                                                         tendermint                          
-Kusama              kusama         1          1              mainnet                                                         -                                   
-Kyve                kyve           1          1              mainnet                                                         tendermint                          
-Lava                lava           1          1              mainnet                                                         tendermint                          
-Linea               linea          3          2              mainnet, sepolia                                                geth                                
-Litecoin            litecoin       2          1              mainnet                                                         -                                   
-Lum                 lum            1          1              mainnet                                                         tendermint                          
-Lumera              lumera         1          1              mainnet                                                         -                                   
-Lumera              lumera         1          1              mainnet                                                         tendermint                          
-Mantle              mantle         2          1              mainnet                                                         geth                                
-Mantra              mantra         1          1              mainnet                                                         tendermint                          
-MAP Protocol        map            1          1              mainnet                                                         -                                   
-Medibloc            medibloc       1          1              mainnet                                                         -                                   
-Metis               metis          4          2              mainnet, sepolia                                                l2geth                              
-Moonbeam            moonbeam       2          1              mainnet                                                         -                                   
-Moonriver           moonriver      2          1              mainnet                                                         -                                   
-Namada              namada         1          1              mainnet                                                         tendermint                          
-NEAR Protocol       near           1          1              mainnet                                                         -                                   
-Neutron             neutron        1          1              mainnet                                                         -                                   
-Neutron             neutron        1          1              mainnet                                                         tendermint                          
-Nibiru              nibiru         1          1              mainnet                                                         tendermint                          
-Noble               noble          1          1              mainnet                                                         tendermint                          
-Nolus               nolus          1          1              mainnet                                                         tendermint                          
-Nomic               nomic          1          1              mainnet                                                         tendermint                          
-Nym                 nym            1          1              mainnet                                                         tendermint                          
-opBNB               opbnb          6          2              mainnet, testnet                                                geth, reth                          
-Optimism            optimism       4          2              mainnet, sepolia                                                reth                                
-Oraichain           orai           1          1              mainnet                                                         -                                   
-Oraichain           orai           1          1              mainnet                                                         tendermint                          
-Osmosis             osmosis        1          1              mainnet                                                         -                                   
-Osmosis             osmosis        1          1              mainnet                                                         tendermint                          
-Passage             passage        1          1              mainnet                                                         tendermint                          
-Penumbra            penumbra       1          1              mainnet                                                         tendermint                          
-Persistence         persistence    1          1              mainnet                                                         tendermint                          
-Picasso             picasso        1          1              mainnet                                                         tendermint                          
-PIVX                pivx           2          1              mainnet                                                         -                                   
-Planq               planq          1          1              mainnet                                                         tendermint                          
-Pocket Network      pocket         1          1              mainnet                                                         tendermint                          
-Polkadot            polkadot       1          1              mainnet                                                         -                                   
-Polygon             polygon        11         2              amoy, mainnet                                                   bor, erigon, heimdall               
-Provenance          provenance     1          1              mainnet                                                         tendermint                          
-PulseChain          pulsechain     6          2              mainnet, testnet                                                geth, prysm                         
-Quicksilver         quicksilver    1          1              mainnet                                                         tendermint                          
-Radix               radixdlt       1          1              babylon                                                         -                                   
-Regen Network       regen          1          1              mainnet                                                         tendermint                          
-Saga                saga           1          1              mainnet                                                         -                                   
-Saga                saga           1          1              mainnet                                                         tendermint                          
-Scroll              scroll         4          2              mainnet, sepolia                                                geth                                
-SEDA                seda           1          1              mainnet                                                         tendermint                          
-Sei                 sei            1          1              mainnet                                                         -                                   
-Sei                 sei            1          1              mainnet                                                         tendermint                          
-Sentinel            sentinel       1          1              mainnet                                                         -                                   
-Sentinel dVPN       sentinel       1          1              mainnet                                                         tendermint                          
-Shentu              shentu         1          1              mainnet                                                         tendermint                          
-Shido               shido          1          1              mainnet                                                         tendermint                          
-Sifchain            sifchain       1          1              mainnet                                                         tendermint                          
-Sommelier           sommelier      1          1              mainnet                                                         tendermint                          
-Somnia              somnia         1          1              mainnet                                                         -                                   
-Soneium             soneium        2          2              mainnet, sepolia                                                reth                                
-Sonic               sonic          1          1              mainnet                                                         -                                   
-Source              source         1          1              mainnet                                                         tendermint                          
-Starknet            starknet       2          2              mainnet, sepolia                                                juno                                
-Story               story          3          1              mainnet                                                         client, geth                        
-Stride              stride         1          1              mainnet                                                         tendermint                          
-Sui                 sui            4          2              mainnet, testnet                                                -                                   
-Sunrise             sunrise        1          1              mainnet                                                         tendermint                          
-Symbol              symbol         2          1              mainnet                                                         mongodb, node                       
-Syscoin             syscoin        3          2              mainnet, testnet                                                -                                   
-Tacchain            tacchain       1          1              mainnet                                                         tendermint                          
-Taiko               taiko          4          2              hoodi, mainnet                                                  geth                                
-Tempo               tempo          1          1              mainnet                                                         -                                   
-Teritori            teritori       1          1              mainnet                                                         tendermint                          
-Terra               terra          1          1              mainnet                                                         -                                   
-Terra               terra          1          1              mainnet                                                         tendermint                          
-Terra Classic       terra-classic  1          1              mainnet                                                         -                                   
-TRON                tron           1          1              mainnet                                                         -                                   
-TX                  tx-chain       1          1              mainnet                                                         -                                   
-Umee                umee           1          1              mainnet                                                         tendermint                          
-Unichain            unichain       2          2              mainnet, sepolia                                                reth                                
-Union               union          1          1              mainnet                                                         tendermint                          
-UnUniFi             ununifi        1          1              mainnet                                                         tendermint                          
-Verona              verona         1          1              mainnet                                                         tendermint                          
-Warden              warden         1          1              mainnet                                                         -                                   
-Warden              warden         1          1              mainnet                                                         tendermint                          
-WEMIX               wemix          1          1              mainnet                                                         -                                   
-Wormchain           wormchain      1          1              mainnet                                                         tendermint                          
-XPLA                xpla           1          1              mainnet                                                         -                                   
-XPLA                xpla           1          1              mainnet                                                         tendermint                          
-XRPL EVM Sidechain  xrp            1          1              mainnet                                                         tendermint                          
-ZetaChain           zetachain      1          1              mainnet                                                         tendermint                          
-Zigchain            zigchain       1          1              mainnet                                                         tendermint
+chain               id             network_names                                                   clients                             
+------------------  -------------  --------------------------------------------------------------  ------------------------------------
+0g                  og             mainnet                                                         chain, geth                         
+Agoric              agoric         mainnet                                                         tendermint                          
+Akash               akash          mainnet                                                         tendermint                          
+Akash Network       akash          mainnet                                                         -                                   
+Allora              allora         mainnet                                                         tendermint                          
+Althea              althea         mainnet                                                         tendermint                          
+Andromeda           andromeda      mainnet                                                         tendermint                          
+Aptos               aptos          mainnet                                                         -                                   
+Arbitrum            arbitrum       mainnet, nova, sepolia                                          -                                   
+Archway             archway        mainnet                                                         tendermint                          
+Arkeo               arkeo          mainnet                                                         tendermint                          
+Asset Mantle        assetmantle    mainnet                                                         tendermint                          
+AtomOne             atomone        mainnet                                                         -                                   
+Aura                aura           mainnet                                                         tendermint                          
+Avail               avail          mainnet, turing                                                 -                                   
+Avalanche           avalanche      fuji, mainnet                                                   -                                   
+Axelar              axelar         mainnet                                                         -                                   
+Axelar              axelar         mainnet                                                         tendermint                          
+Babylon             babylon        mainnet                                                         -                                   
+Babylon             babylon        mainnet                                                         tendermint                          
+Band                band           mainnet                                                         tendermint                          
+Base                base           mainnet, sepolia                                                reth                                
+Berachain           berachain      mainnet                                                         beacon, reth                        
+BitBadges           bitbadges      mainnet                                                         tendermint                          
+Bitcoin             bitcoin        mainnet, testnet                                                -                                   
+Bitcoin SV          bsv            mainnet                                                         -                                   
+Bitsong             bitsong        mainnet                                                         tendermint                          
+Bitway              bitway         mainnet                                                         -                                   
+Bitway              bitway         mainnet                                                         tendermint                          
+Blast               blast          mainnet                                                         geth                                
+BNB Smart Chain     bsc            mainnet, testnet                                                geth                                
+Canto               canto          mainnet                                                         tendermint                          
+Carbon              carbon         mainnet                                                         tendermint                          
+Cardano             cardano        mainnet                                                         -                                   
+Celer Network       celer          mainnet                                                         -                                   
+Celestia            celestia       mainnet, testnet                                                -                                   
+Celestia            celestia       mainnet                                                         tendermint                          
+Celo                celo           mainnet                                                         geth                                
+Chain4Energy        chain4energy   mainnet                                                         tendermint                          
+Cheqd               cheqd          mainnet                                                         -                                   
+Cheqd               cheqd          mainnet                                                         tendermint                          
+Chihuahua           chihuahua      mainnet                                                         tendermint                          
+Chiliz              chiliz         mainnet, spicy                                                  -                                   
+Coreum              coreum         mainnet                                                         tendermint                          
+Cosmos              cosmos         mainnet                                                         -                                   
+CosmosHub           cosmos         mainnet                                                         tendermint                          
+Crescent            crescent       mainnet                                                         tendermint                          
+Cronos              cronos         mainnet                                                         -                                   
+Cronos              cronos         mainnet                                                         tendermint                          
+Cronos PoS Chain    cronos-pos     mainnet                                                         -                                   
+Crypto.org          cryptocom      mainnet                                                         tendermint                          
+Dash                dash           mainnet, testnet                                                -                                   
+Decentr             decentr        mainnet                                                         tendermint                          
+DeFiChain           defi           mainnet                                                         -                                   
+dHealth             dhealth        mainnet                                                         tendermint                          
+Dora                dora           mainnet                                                         tendermint                          
+Dora Factory        dora           mainnet                                                         -                                   
+dYdX                dydx           mainnet                                                         -                                   
+dYdX                dydx           mainnet                                                         tendermint                          
+Dymension           dymension      mainnet                                                         tendermint                          
+Elys Network        elys           mainnet, testnet                                                -                                   
+Empower             empower        mainnet                                                         tendermint                          
+Energi              energi         mainnet                                                         -                                   
+Ethereum            ethereum       mainnet, sepolia, hoodi, holesky, perf-devnet-2, perf-devnet-3  besu, erigon, geth, nethermind, reth
+Fetch               fetch          mainnet                                                         tendermint                          
+Fetch.ai            fetch          mainnet                                                         -                                   
+FirmaChain          firmachain     mainnet                                                         tendermint                          
+Firo                firo           mainnet                                                         -                                   
+Fraxtal             fraxtal        hoodi, mainnet                                                  geth                                
+Gitopia             gitopia        mainnet                                                         tendermint                          
+Gnosis              gnosis         chiado, mainnet                                                 nethermind, teku                    
+Gravity             gravity        mainnet                                                         tendermint                          
+HAQQ                haqq           mainnet                                                         -                                   
+Haqq                haqq           mainnet                                                         tendermint                          
+Hippo Protocol      hippo          mainnet                                                         tendermint                          
+Humans              humans         mainnet                                                         tendermint                          
+Initia              initia         mainnet                                                         tendermint                          
+Injective           injective      mainnet, testnet                                                -                                   
+Injective           injective      mainnet                                                         tendermint                          
+interval            interval       mainnet                                                         tendermint                          
+Jackal              jackal         mainnet                                                         tendermint                          
+Juno                juno           mainnet                                                         -                                   
+Juno                juno           mainnet                                                         tendermint                          
+Kava                kava           mainnet                                                         -                                   
+Kava                kava           mainnet                                                         tendermint                          
+Kujira              kujira         mainnet                                                         tendermint                          
+Kusama              kusama         mainnet                                                         -                                   
+Kyve                kyve           mainnet                                                         tendermint                          
+Lava                lava           mainnet                                                         tendermint                          
+Linea               linea          mainnet, sepolia                                                geth                                
+Litecoin            litecoin       mainnet                                                         -                                   
+Lum                 lum            mainnet                                                         tendermint                          
+Lumera              lumera         mainnet                                                         -                                   
+Lumera              lumera         mainnet                                                         tendermint                          
+Mantle              mantle         mainnet                                                         geth                                
+Mantra              mantra         mainnet                                                         tendermint                          
+MAP Protocol        map            mainnet                                                         -                                   
+Medibloc            medibloc       mainnet                                                         -                                   
+Metis               metis          mainnet, sepolia                                                l2geth                              
+Moonbeam            moonbeam       mainnet                                                         -                                   
+Moonriver           moonriver      mainnet                                                         -                                   
+Namada              namada         mainnet                                                         tendermint                          
+NEAR Protocol       near           mainnet                                                         -                                   
+Neutron             neutron        mainnet                                                         -                                   
+Neutron             neutron        mainnet                                                         tendermint                          
+Nibiru              nibiru         mainnet                                                         tendermint                          
+Noble               noble          mainnet                                                         tendermint                          
+Nolus               nolus          mainnet                                                         tendermint                          
+Nomic               nomic          mainnet                                                         tendermint                          
+Nym                 nym            mainnet                                                         tendermint                          
+opBNB               opbnb          mainnet, testnet                                                geth, reth                          
+Optimism            optimism       mainnet, sepolia                                                reth                                
+Oraichain           orai           mainnet                                                         -                                   
+Oraichain           orai           mainnet                                                         tendermint                          
+Osmosis             osmosis        mainnet                                                         -                                   
+Osmosis             osmosis        mainnet                                                         tendermint                          
+Passage             passage        mainnet                                                         tendermint                          
+Penumbra            penumbra       mainnet                                                         tendermint                          
+Persistence         persistence    mainnet                                                         tendermint                          
+Picasso             picasso        mainnet                                                         tendermint                          
+PIVX                pivx           mainnet                                                         -                                   
+Planq               planq          mainnet                                                         tendermint                          
+Pocket Network      pocket         mainnet                                                         tendermint                          
+Polkadot            polkadot       mainnet                                                         -                                   
+Polygon             polygon        amoy, mainnet                                                   bor, erigon, heimdall               
+Provenance          provenance     mainnet                                                         tendermint                          
+PulseChain          pulsechain     mainnet, testnet                                                geth, prysm                         
+Quicksilver         quicksilver    mainnet                                                         tendermint                          
+Radix               radixdlt       babylon                                                         -                                   
+Regen Network       regen          mainnet                                                         tendermint                          
+Saga                saga           mainnet                                                         -                                   
+Saga                saga           mainnet                                                         tendermint                          
+Scroll              scroll         mainnet, sepolia                                                geth                                
+SEDA                seda           mainnet                                                         tendermint                          
+Sei                 sei            mainnet                                                         -                                   
+Sei                 sei            mainnet                                                         tendermint                          
+Sentinel            sentinel       mainnet                                                         -                                   
+Sentinel dVPN       sentinel       mainnet                                                         tendermint                          
+Shentu              shentu         mainnet                                                         tendermint                          
+Shido               shido          mainnet                                                         tendermint                          
+Sifchain            sifchain       mainnet                                                         tendermint                          
+Sommelier           sommelier      mainnet                                                         tendermint                          
+Somnia              somnia         mainnet                                                         -                                   
+Soneium             soneium        mainnet, sepolia                                                reth                                
+Sonic               sonic          mainnet                                                         -                                   
+Source              source         mainnet                                                         tendermint                          
+Starknet            starknet       mainnet, sepolia                                                juno                                
+Story               story          mainnet                                                         client, geth                        
+Stride              stride         mainnet                                                         tendermint                          
+Sui                 sui            mainnet, testnet                                                -                                   
+Sunrise             sunrise        mainnet                                                         tendermint                          
+Symbol              symbol         mainnet                                                         mongodb, node                       
+Syscoin             syscoin        mainnet, testnet                                                -                                   
+Tacchain            tacchain       mainnet                                                         tendermint                          
+Taiko               taiko          hoodi, mainnet                                                  geth                                
+Tempo               tempo          mainnet                                                         -                                   
+Teritori            teritori       mainnet                                                         tendermint                          
+Terra               terra          mainnet                                                         -                                   
+Terra               terra          mainnet                                                         tendermint                          
+Terra Classic       terra-classic  mainnet                                                         -                                   
+TRON                tron           mainnet                                                         -                                   
+TX                  tx-chain       mainnet                                                         -                                   
+Umee                umee           mainnet                                                         tendermint                          
+Unichain            unichain       mainnet, sepolia                                                reth                                
+Union               union          mainnet                                                         tendermint                          
+UnUniFi             ununifi        mainnet                                                         tendermint                          
+Verona              verona         mainnet                                                         tendermint                          
+Warden              warden         mainnet                                                         -                                   
+Warden              warden         mainnet                                                         tendermint                          
+WEMIX               wemix          mainnet                                                         -                                   
+Wormchain           wormchain      mainnet                                                         tendermint                          
+XPLA                xpla           mainnet                                                         -                                   
+XPLA                xpla           mainnet                                                         tendermint                          
+XRPL EVM Sidechain  xrp            mainnet                                                         tendermint                          
+ZetaChain           zetachain      mainnet                                                         tendermint                          
+Zigchain            zigchain       mainnet                                                         tendermint
 ```
 
 ## CLI Reference
@@ -285,7 +285,7 @@ Zigchain            zigchain       1          1              mainnet            
 --archive/--no-archive Filter archive snapshots.
 --pruned/--no-pruned   Filter pruned snapshots.
 --include-outdated     Include PublicNode entries marked as outdated.
---list-chains          List available chain names with network counts and names.
+--list-chains          List available chain names with network names.
 --url-only             Print only snapshot URLs.
 --json                 Print JSON metadata.
 --timeout SECONDS      Network timeout. Defaults to 30.

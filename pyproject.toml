@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snapfetcher"
+version = "0.1.0"
+description = "Fetch PublicNode snapshot URLs from the live snapshots page."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "snapfetcher contributors" }]
+dependencies = []
+
+[project.scripts]
+snapfetcher = "snapfetcher.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

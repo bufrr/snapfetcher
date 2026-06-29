@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import sys
 from typing import Sequence
@@ -31,6 +33,8 @@ from .publicnode import (
 def main(argv: Sequence[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
+    if args.json and args.csv:
+        parser.error("--json and --csv cannot be used together")
 
     try:
         if args.list_chains:
@@ -43,6 +47,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             if args.json:
                 print(json.dumps([_chain_to_dict(chain) for chain in chains], indent=2))
+            elif args.csv:
+                print(_format_chain_csv(chains))
             else:
                 print(_format_chain_table(chains))
             return 0
@@ -74,6 +80,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.json:
         print(json.dumps([_snapshot_to_dict(snapshot) for snapshot in matches], indent=2))
+    elif args.csv:
+        print(_format_snapshot_csv(matches))
     elif args.url_only:
         for snapshot in matches:
             print(snapshot.url)
@@ -129,7 +137,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--list-chains",
         action="store_true",
-        help="List all chain names available through the configured snapshot sources.",
+        help="List chain names, IDs, network names, and clients.",
     )
     parser.add_argument(
         "--url-only",
@@ -140,6 +148,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--json",
         action="store_true",
         help="Print matching snapshot metadata as JSON.",
+    )
+    parser.add_argument(
+        "--csv",
+        action="store_true",
+        help="Print spreadsheet-friendly CSV output.",
     )
     parser.add_argument(
         "--timeout",
@@ -264,6 +277,48 @@ def _format_chain_table(chains: list[ChainSummary]) -> str:
         if row_index == 0:
             lines.append("  ".join("-" * width for width in widths))
     return "\n".join(lines)
+
+
+def _format_chain_csv(chains: list[ChainSummary]) -> str:
+    rows = [
+        (
+            chain.currency_name,
+            chain.currency_id,
+            ", ".join(chain.networks) or "-",
+            ", ".join(chain.clients) or "-",
+        )
+        for chain in chains
+    ]
+    return _format_csv(("chain", "id", "network_names", "clients"), rows)
+
+
+def _format_snapshot_csv(snapshots: list[Snapshot]) -> str:
+    rows = [
+        (
+            snapshot.source,
+            snapshot.currency_id,
+            snapshot.network_name,
+            snapshot.client_id or "-",
+            snapshot.snapshot_type,
+            snapshot.height_label,
+            snapshot.compressed_size_label,
+            snapshot.uploaded_at or "-",
+            snapshot.url,
+        )
+        for snapshot in snapshots
+    ]
+    return _format_csv(
+        ("source", "chain", "network", "client", "type", "height", "compressed", "uploaded", "url"),
+        rows,
+    )
+
+
+def _format_csv(headers: tuple[str, ...], rows) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output, lineterminator="\n")
+    writer.writerow(headers)
+    writer.writerows(rows)
+    return output.getvalue().rstrip("\n")
 
 
 def _snapshot_to_dict(snapshot: Snapshot) -> dict[str, object]:

@@ -1,6 +1,6 @@
 import unittest
 
-from snapfetcher.cli import _chain_to_dict, _format_chain_table
+from snapfetcher.cli import _chain_to_dict, _format_chain_csv, _format_chain_table
 from snapfetcher.publicnode import ChainSummary
 
 
@@ -40,6 +40,24 @@ class CliTest(unittest.TestCase):
         self.assertEqual(payload["networkCount"], 2)
         self.assertEqual(payload["networkNames"], ["mainnet", "sepolia"])
         self.assertEqual(payload["networks"], ["mainnet", "sepolia"])
+
+    def test_chain_csv_is_spreadsheet_friendly(self):
+        csv_output = _format_chain_csv(
+            [
+                ChainSummary(
+                    currency_id="bitcoin",
+                    currency_name="Bitcoin",
+                    snapshot_count=4,
+                    networks=("mainnet", "testnet"),
+                    clients=(),
+                )
+            ]
+        )
+
+        self.assertEqual(
+            csv_output,
+            "chain,id,network_names,clients\nBitcoin,bitcoin,\"mainnet, testnet\",-",
+        )
 
 
 if __name__ == "__main__":

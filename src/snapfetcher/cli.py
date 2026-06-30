@@ -7,19 +7,6 @@ import json
 import sys
 from typing import Sequence
 
-from .ethpanda import (
-    ETHPANDA_CLIENTS,
-    ETHPANDA_NETWORKS,
-    fetch_ethpanda_snapshots,
-    is_ethereum_chain,
-    is_ethereum_snapshot,
-)
-from .polkachu import (
-    fetch_polkachu_chains,
-    fetch_polkachu_snapshots,
-    find_polkachu_chain,
-    polkachu_chain_summaries,
-)
 from .publicnode import (
     ChainSummary,
     Snapshot,
@@ -28,7 +15,6 @@ from .publicnode import (
     find_snapshots,
     list_chains,
 )
-from .speedtest import select_fastest_source
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -38,14 +24,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--json and --csv cannot be used together")
 
     try:
+        snapshots = fetch_publicnode_snapshots(timeout=args.timeout)
         if args.list_chains:
-            snapshots = fetch_publicnode_snapshots(timeout=args.timeout)
-            polkachu_chains = fetch_polkachu_chains(timeout=args.timeout)
-            chains = _list_combined_chains(
-                snapshots,
-                polkachu_chains=polkachu_chains,
-                include_outdated=args.include_outdated,
-            )
+            chains = list_chains(snapshots, include_outdated=args.include_outdated)
             if args.json:
                 print(json.dumps([_chain_to_dict(chain) for chain in chains], indent=2))
             elif args.csv:
@@ -55,15 +36,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
 
         chain, network, client = _resolve_filters(args)
-        snapshots = _fetch_snapshots_for_filters(
-            chain=chain,
-            network=network,
-            client=client,
-            timeout=args.timeout,
-        )
         matches = find_snapshots(
             snapshots,
-            chain="ethereum" if is_ethereum_chain(chain) else chain,
+            chain=chain,
             network=network,
             client=client,
             snapshot_type=args.snapshot_type,
@@ -71,8 +46,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             archive=args.archive,
             pruned=args.pruned,
         )
-        if args.fastest:
-            matches = select_fastest_source(matches, timeout=args.timeout)
     except SnapshotFetchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -96,14 +69,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Fetch snapshot URLs from PublicNode, EthPandaOps, and PolkaChu snapshots.",
+        description="Fetch snapshot URLs from PublicNode snapshots.",
     )
     parser.add_argument(
         "--chain",
         help=(
             "Chain ID or name to match. If omitted, defaults to Ethereum "
-            "mainnet geth with fastest-source selection. If supplied without --network or "
-            "--client, matches all snapshots for that chain before fastest-source selection."
+            "mainnet geth. If supplied without --network or --client, matches all "
+            "PublicNode snapshots for that chain."
         ),
     )
     parser.add_argument(
@@ -158,15 +131,6 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Print spreadsheet-friendly CSV output.",
     )
     parser.add_argument(
-        "--fastest",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help=(
-            "Benchmark matching snapshot source groups and keep the fastest source per group. "
-            "Use --no-fastest to return all matching sources."
-        ),
-    )
-    parser.add_argument(
         "--timeout",
         type=float,
         default=30.0,
@@ -185,86 +149,6 @@ def _resolve_filters(args: argparse.Namespace) -> tuple[str, str | None, str | N
         client = client or "geth"
 
     return chain, network, client
-
-
-def _fetch_snapshots_for_filters(
-    *,
-    chain: str,
-    network: str | None,
-    client: str | None,
-    timeout: float,
-) -> list[Snapshot]:
-    if is_ethereum_chain(chain):
-        snapshots = fetch_ethpanda_snapshots(network=network, client=client, timeout=timeout)
-        snapshots.extend(fetch_publicnode_snapshots(timeout=timeout))
-        return snapshots
-
-    polkachu_chains = fetch_polkachu_chains(timeout=timeout)
-    snapshots = fetch_publicnode_snapshots(timeout=timeout)
-    if find_polkachu_chain(polkachu_chains, chain):
-        snapshots.extend(
-            fetch_polkachu_snapshots(chain=chain, timeout=timeout, chains=polkachu_chains)
-        )
-
-    return snapshots
-
-
-def _list_combined_chains(
-    snapshots: list[Snapshot],
-    *,
-    polkachu_chains,
-    include_outdated: bool,
-) -> list[ChainSummary]:
-    publicnode_without_ethereum = [
-        snapshot for snapshot in snapshots if not is_ethereum_snapshot(snapshot)
-    ]
-    chains = list_chains(
-        publicnode_without_ethereum,
-        include_outdated=include_outdated,
-    )
-    chains.append(_ethereum_chain_summary(snapshots, include_outdated=include_outdated))
-    chains.extend(polkachu_chain_summaries(polkachu_chains))
-    return sorted(chains, key=lambda chain: chain.currency_name.casefold())
-
-
-def _ethereum_chain_summary(
-    snapshots: list[Snapshot],
-    *,
-    include_outdated: bool,
-) -> ChainSummary:
-    publicnode_ethereum = [
-        snapshot for snapshot in snapshots if is_ethereum_snapshot(snapshot)
-    ]
-    publicnode_chains = list_chains(publicnode_ethereum, include_outdated=include_outdated)
-    publicnode_chain = publicnode_chains[0] if publicnode_chains else None
-
-    return ChainSummary(
-        currency_id="ethereum",
-        currency_name="Ethereum",
-        snapshot_count=(len(ETHPANDA_NETWORKS) * len(ETHPANDA_CLIENTS))
-        + (publicnode_chain.snapshot_count if publicnode_chain else 0),
-        networks=_merge_values(
-            ETHPANDA_NETWORKS,
-            publicnode_chain.networks if publicnode_chain else (),
-        ),
-        clients=_merge_values(
-            ETHPANDA_CLIENTS,
-            publicnode_chain.clients if publicnode_chain else (),
-        ),
-    )
-
-
-def _merge_values(*groups: tuple[str, ...]) -> tuple[str, ...]:
-    values: list[str] = []
-    seen: set[str] = set()
-    for group in groups:
-        for value in group:
-            key = value.casefold()
-            if key in seen:
-                continue
-            values.append(value)
-            seen.add(key)
-    return tuple(values)
 
 
 def _format_table(snapshots: list[Snapshot]) -> str:

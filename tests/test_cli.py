@@ -7,6 +7,7 @@ from snapfetcher.cli import (
     _chain_to_dict,
     _format_chain_csv,
     _format_chain_table,
+    _resolve_sources,
 )
 from snapfetcher.publicnode import ChainSummary, Snapshot
 
@@ -81,6 +82,44 @@ class CliTest(unittest.TestCase):
             self.assertEqual(output.getvalue().strip(), "https://example.com/publicnode.tar.lz4")
         finally:
             cli.fetch_publicnode_snapshots = original_publicnode
+
+    def test_resolves_all_sources(self):
+        self.assertEqual(
+            _resolve_sources(["all"]),
+            ("publicnode", "polkachu", "lavender", "kjnodes"),
+        )
+
+    def test_main_selects_best_source_for_multi_source_lookup(self):
+        originals = (
+            cli.fetch_publicnode_snapshots,
+            cli.fetch_polkachu_snapshots,
+            cli.fetch_lavender_snapshots,
+            cli.fetch_kjnodes_snapshots,
+            cli.select_best_source,
+        )
+        try:
+            publicnode = _snapshot("publicnode", "Cosmos", client_id=None, currency_id="cosmos")
+            polkachu = _snapshot("polkachu", "Cosmos Hub", client_id="tendermint", currency_id="cosmos")
+            cli.fetch_publicnode_snapshots = lambda timeout: [publicnode]
+            cli.fetch_polkachu_snapshots = lambda chain, timeout: [polkachu]
+            cli.fetch_lavender_snapshots = lambda chain, network, timeout: []
+            cli.fetch_kjnodes_snapshots = lambda chain, network, timeout: []
+            cli.select_best_source = lambda snapshots, timeout, max_height_lag: [polkachu]
+            output = StringIO()
+
+            with redirect_stdout(output):
+                code = cli.main(["--chain", "Cosmos", "--source", "all", "--url-only"])
+
+            self.assertEqual(code, 0)
+            self.assertEqual(output.getvalue().strip(), "https://example.com/polkachu.tar.lz4")
+        finally:
+            (
+                cli.fetch_publicnode_snapshots,
+                cli.fetch_polkachu_snapshots,
+                cli.fetch_lavender_snapshots,
+                cli.fetch_kjnodes_snapshots,
+                cli.select_best_source,
+            ) = originals
 
 
 def _snapshot(source, currency_name, *, client_id, currency_id="axelar"):

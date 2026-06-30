@@ -1,13 +1,19 @@
 # snapfetcher
 
 `snapfetcher` fetches snapshot metadata and download URLs from
-[PublicNode snapshots](https://www.publicnode.com/snapshots).
+[PublicNode snapshots](https://www.publicnode.com/snapshots) by default.
+Optional Cosmos-family sources are available for explicit multi-source lookups:
+[PolkaChu](https://www.polkachu.com/tendermint_snapshots),
+[Lavender.Five](https://www.lavenderfive.com/tools), and
+[KJNodes](https://services.kjnodes.com/).
 
 ## Features
 
-- List every chain currently available through PublicNode snapshots.
+- List every chain currently available through the selected snapshot sources.
 - Fetch snapshot URLs by chain name.
 - Filter by network, client, snapshot type, archive, and pruned status.
+- Keep PublicNode as the default source unless another source is requested.
+- For multi-source lookups, filter stale candidates by height, then speed-test the remaining sources.
 - Output human-readable tables, URL-only output, JSON, or CSV.
 - Defaults to Ethereum mainnet `geth`.
 
@@ -46,10 +52,34 @@ Fetch every PublicNode snapshot for a chain:
 PYTHONPATH=src python3 -m snapfetcher --chain "Bitcoin"
 ```
 
+Fetch the best Cosmos mainnet source from all configured providers:
+
+```bash
+PYTHONPATH=src python3 -m snapfetcher --chain Cosmos --network mainnet --source all --url-only
+```
+
+Show every Cosmos mainnet candidate instead of selecting one:
+
+```bash
+PYTHONPATH=src python3 -m snapfetcher --chain Cosmos --network mainnet --source all --no-best-source --csv
+```
+
+Fetch from a specific optional source:
+
+```bash
+PYTHONPATH=src python3 -m snapfetcher --chain Cosmos --network mainnet --source lavender --url-only
+```
+
 List all PublicNode chains currently available:
 
 ```bash
 PYTHONPATH=src python3 -m snapfetcher --list-chains
+```
+
+List all chains from every configured source:
+
+```bash
+PYTHONPATH=src python3 -m snapfetcher --list-chains --source all
 ```
 
 Write the chain list as a spreadsheet-friendly CSV:
@@ -74,7 +104,8 @@ PYTHONPATH=src python3 -m snapfetcher --chain Ethereum --client reth --json
 
 This list was fetched from PublicNode on 2026-06-30. PublicNode can add or
 remove chains over time, so run `snapfetcher --list-chains` for the latest live
-list.
+default-source list. Use `--list-chains --source all` to include optional
+Cosmos-family sources.
 
 A spreadsheet-friendly CSV copy is available at [chains.csv](chains.csv).
 
@@ -178,13 +209,25 @@ A spreadsheet-friendly CSV copy is available at [chains.csv](chains.csv).
 --url-only             Print only snapshot URLs.
 --json                 Print JSON metadata.
 --csv                  Print spreadsheet-friendly CSV output.
+--source SOURCE        Source to query: publicnode, polkachu, lavender, kjnodes, or all.
+--best-source/--no-best-source
+                       For multiple sources, choose the best source after freshness filtering.
+--max-height-lag N     Maximum block-height lag from the freshest candidate before speed testing.
 --timeout SECONDS      Network timeout. Defaults to 30.
 ```
 
 ## Python API
 
 ```python
-from snapfetcher import fetch_publicnode_snapshots, find_snapshots, list_chains
+from snapfetcher import (
+    fetch_kjnodes_snapshots,
+    fetch_lavender_snapshots,
+    fetch_polkachu_snapshots,
+    fetch_publicnode_snapshots,
+    find_snapshots,
+    list_chains,
+    select_best_source,
+)
 
 snapshots = fetch_publicnode_snapshots()
 chains = list_chains(snapshots)
@@ -195,6 +238,13 @@ ethereum_reth = find_snapshots(
     network="mainnet",
     client="reth",
 )
+
+cosmos_candidates = []
+cosmos_candidates.extend(find_snapshots(snapshots, chain="Cosmos", network="mainnet"))
+cosmos_candidates.extend(fetch_polkachu_snapshots(chain="Cosmos"))
+cosmos_candidates.extend(fetch_lavender_snapshots(chain="Cosmos", network="mainnet"))
+cosmos_candidates.extend(fetch_kjnodes_snapshots(chain="Cosmos", network="mainnet"))
+best_cosmos_source = select_best_source(cosmos_candidates)
 ```
 
 ## Tests

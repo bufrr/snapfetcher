@@ -7,6 +7,15 @@ import json
 import sys
 from typing import Sequence
 
+from .external import (
+    chain_summaries,
+    fetch_kjnodes_chains,
+    fetch_kjnodes_snapshots,
+    fetch_lavender_chains,
+    fetch_lavender_snapshots,
+    fetch_polkachu_chains,
+    fetch_polkachu_snapshots,
+)
 from .publicnode import (
     ChainSummary,
     Snapshot,
@@ -15,6 +24,10 @@ from .publicnode import (
     find_snapshots,
     list_chains,
 )
+from .selector import select_best_source
+
+SOURCE_CHOICES = ("publicnode", "polkachu", "lavender", "kjnodes", "all")
+ALL_SOURCES = ("publicnode", "polkachu", "lavender", "kjnodes")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -24,9 +37,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--json and --csv cannot be used together")
 
     try:
-        snapshots = fetch_publicnode_snapshots(timeout=args.timeout)
+        sources = _resolve_sources(args.source)
         if args.list_chains:
-            chains = list_chains(snapshots, include_outdated=args.include_outdated)
+            chains = _list_chains_for_sources(
+                sources,
+                timeout=args.timeout,
+                include_outdated=args.include_outdated,
+            )
             if args.json:
                 print(json.dumps([_chain_to_dict(chain) for chain in chains], indent=2))
             elif args.csv:
@@ -36,6 +53,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
 
         chain, network, client = _resolve_filters(args)
+        snapshots = _fetch_snapshots_for_sources(
+            sources,
+            chain=chain,
+            network=network,
+            timeout=args.timeout,
+        )
         matches = find_snapshots(
             snapshots,
             chain=chain,
@@ -46,6 +69,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             archive=args.archive,
             pruned=args.pruned,
         )
+        if args.best_source and len(sources) > 1:
+            matches = select_best_source(
+                matches,
+                timeout=args.timeout,
+                max_height_lag=args.max_height_lag,
+            )
     except SnapshotFetchError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -69,14 +98,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Fetch snapshot URLs from PublicNode snapshots.",
+        description="Fetch snapshot URLs from PublicNode and optional snapshot providers.",
     )
     parser.add_argument(
         "--chain",
         help=(
             "Chain ID or name to match. If omitted, defaults to Ethereum "
             "mainnet geth. If supplied without --network or --client, matches all "
-            "PublicNode snapshots for that chain."
+            "snapshots for that chain from the selected sources."
         ),
     )
     parser.add_argument(
@@ -131,6 +160,30 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Print spreadsheet-friendly CSV output.",
     )
     parser.add_argument(
+        "--source",
+        action="append",
+        choices=SOURCE_CHOICES,
+        help=(
+            "Snapshot source to query. Repeat to query multiple sources. Defaults to publicnode. "
+            "Use --source all for publicnode, polkachu, lavender, and kjnodes."
+        ),
+    )
+    parser.add_argument(
+        "--best-source",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "For multiple sources, keep the fastest source after filtering out snapshots "
+            "older than --max-height-lag from the freshest candidate."
+        ),
+    )
+    parser.add_argument(
+        "--max-height-lag",
+        type=int,
+        default=1000,
+        help="Maximum block-height lag from the freshest candidate before speed testing. Defaults to 1000.",
+    )
+    parser.add_argument(
         "--timeout",
         type=float,
         default=30.0,
@@ -149,6 +202,87 @@ def _resolve_filters(args: argparse.Namespace) -> tuple[str, str | None, str | N
         client = client or "geth"
 
     return chain, network, client
+
+
+def _resolve_sources(values: list[str] | None) -> tuple[str, ...]:
+    selected = values or ["publicnode"]
+    if "all" in selected:
+        selected = list(ALL_SOURCES)
+
+    sources: list[str] = []
+    seen: set[str] = set()
+    for source in selected:
+        if source == "all":
+            continue
+        if source not in seen:
+            sources.append(source)
+            seen.add(source)
+    return tuple(sources)
+
+
+def _fetch_snapshots_for_sources(
+    sources: tuple[str, ...],
+    *,
+    chain: str,
+    network: str | None,
+    timeout: float,
+) -> list[Snapshot]:
+    snapshots: list[Snapshot] = []
+    if "publicnode" in sources:
+        snapshots.extend(fetch_publicnode_snapshots(timeout=timeout))
+    if "polkachu" in sources:
+        snapshots.extend(fetch_polkachu_snapshots(chain=chain, timeout=timeout))
+    if "lavender" in sources:
+        snapshots.extend(fetch_lavender_snapshots(chain=chain, network=network, timeout=timeout))
+    if "kjnodes" in sources:
+        snapshots.extend(fetch_kjnodes_snapshots(chain=chain, network=network, timeout=timeout))
+    return snapshots
+
+
+def _list_chains_for_sources(
+    sources: tuple[str, ...],
+    *,
+    timeout: float,
+    include_outdated: bool,
+) -> list[ChainSummary]:
+    chains: list[ChainSummary] = []
+    if "publicnode" in sources:
+        chains.extend(list_chains(fetch_publicnode_snapshots(timeout=timeout), include_outdated=include_outdated))
+    if "polkachu" in sources:
+        chains.extend(chain_summaries(fetch_polkachu_chains(timeout=timeout), client_id="tendermint"))
+    if "lavender" in sources:
+        chains.extend(chain_summaries(fetch_lavender_chains(timeout=timeout), client_id="tendermint"))
+    if "kjnodes" in sources:
+        chains.extend(chain_summaries(fetch_kjnodes_chains(timeout=timeout), client_id="tendermint"))
+    return _merge_chain_summaries(chains)
+
+
+def _merge_chain_summaries(chains: list[ChainSummary]) -> list[ChainSummary]:
+    merged: dict[str, dict[str, object]] = {}
+    for chain in chains:
+        entry = merged.setdefault(
+            chain.currency_id,
+            {
+                "name": chain.currency_name,
+                "count": 0,
+                "networks": set(),
+                "clients": set(),
+            },
+        )
+        entry["count"] += chain.snapshot_count
+        entry["networks"].update(chain.networks)
+        entry["clients"].update(chain.clients)
+
+    return [
+        ChainSummary(
+            currency_id=currency_id,
+            currency_name=str(entry["name"]),
+            snapshot_count=int(entry["count"]),
+            networks=tuple(sorted(entry["networks"], key=str.casefold)),
+            clients=tuple(sorted(entry["clients"], key=str.casefold)),
+        )
+        for currency_id, entry in sorted(merged.items(), key=lambda item: str(item[1]["name"]).casefold())
+    ]
 
 
 def _format_table(snapshots: list[Snapshot]) -> str:
